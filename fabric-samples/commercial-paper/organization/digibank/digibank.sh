@@ -22,6 +22,7 @@ cd "${DIR}/../../../test-network"
 env | sort > /tmp/env.orig
 
 OVERRIDE_ORG="1"
+OVERRIDE_PEER="0"
 . ./scripts/envVar.sh
 
 parsePeerConnectionParameters 1 2

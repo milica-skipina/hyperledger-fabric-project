@@ -44,7 +44,7 @@ infoln "Signing config transaction"
 signConfigtxAsPeerOrg 1 org3_update_in_envelope.pb
 
 infoln "Submitting transaction from a different peer (peer0.org2) which also signs it"
-setGlobals 2
+setGlobals 2 0
 set -x
 peer channel update -f org3_update_in_envelope.pb -c ${CHANNEL_NAME} -o orderer.example.com:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile "$ORDERER_CA"
 { set +x; } 2>/dev/null
