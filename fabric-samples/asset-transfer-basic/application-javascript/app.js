@@ -127,21 +127,37 @@ async function main() {
 			let result = await contract.evaluateTransaction('GetAllAssets');
 			console.log(`*** Result: ${prettyJSONString(result.toString())}`);
 
+			console.log('\n--> Evaluate Transaction: GetAllUsers, function returns all the current users on the ledger');
+			result = await contract.evaluateTransaction('GetAllUsers');
+			console.log(`*** Result: ${prettyJSONString(result.toString())}`);
+
 			// Now let's try to submit a transaction.
 			// This will be sent to both peers and if both peers endorse the transaction, the endorsed proposal will be sent
 			// to the orderer to be committed by each of the peer's to the channel ledger.
 			// TODO
-			// console.log('\n--> Submit Transaction: CreateAsset, creates new asset with ID, color, owner, size, and appraisedValue arguments');
-			// result = await contract.submitTransaction('CreateAsset', 'asset13', 'yellow', '5', 'Tom', '1300');
-			// console.log('*** Result: committed');
-			// if (`${result}` !== '') {
-			// 	console.log(`*** Result: ${prettyJSONString(result.toString())}`);
-			// }
+			console.log('\n--> Submit Transaction: CreateUser, creates new asset with ID, name, lastname, email, money arguments');
+			result = await contract.submitTransaction('CreateUser', 'user4', 'Milan', 'Milanovic', 'milan.milanovic@email.com', '5600');
+			console.log('*** Result: committed');
+			if (`${result}` !== '') {
+				console.log(`*** Result: ${prettyJSONString(result.toString())}`);
+			}
 
-			// console.log('\n--> Evaluate Transaction: ReadAsset, function returns an asset with a given assetID');
-			// result = await contract.evaluateTransaction('ReadAsset', 'asset13');
-			// // console.log(`*** Result: ${prettyJSONString(result.toString())}`);
-			// console.log(`*** Result: ${result.toString()}`);
+			console.log('\n--> Evaluate Transaction: ReadUser, function returns an asset with a given assetID');
+			result = await contract.evaluateTransaction('ReadUser', 'user4');
+		    //console.log(`*** Result: ${prettyJSONString(result.toString())}`);
+			console.log(`*** Result: ${result.toString()}`);
+
+			console.log('\n--> Submit Transaction: CreateAsset, creates new asset with ID, brand, model, year, color, owner, appraisedValue arguments');
+			result = await contract.submitTransaction('CreateAsset', 'asset7', 'Mercedes', 'C', '2000', 'blue', 'user4', '4500');
+			console.log('*** Result: committed');
+			if (`${result}` !== '') {
+				console.log(`*** Result: ${prettyJSONString(result.toString())}`);
+			}
+
+			console.log('\n--> Evaluate Transaction: ReadAsset, function returns an asset with a given assetID');
+			result = await contract.evaluateTransaction('ReadAsset', 'asset7');
+		    //console.log(`*** Result: ${prettyJSONString(result.toString())}`);
+			console.log(`*** Result: ${result.toString()}`);
 
 			console.log('\n--> Evaluate Transaction: AssetExists, function returns "true" if an asset with given assetID exist');
 			result = await contract.evaluateTransaction('AssetExists', 'asset1');
@@ -163,8 +179,42 @@ async function main() {
 			await contract.submitTransaction('TransferAsset', 'asset6', 'user1', 'false');
 			console.log('*** Result: committed');
 
-			console.log('\n--> Evaluate Transaction: ReadAsset, function returns "asset1" attributes');
+			console.log('\n--> Evaluate Transaction: ReadAsset, function returns "asset6" attributes');
 			result = await contract.evaluateTransaction('ReadAsset', 'asset6');
+			console.log(`*** Result: ${prettyJSONString(result.toString())}`);
+
+			console.log('\n--> Submit Transaction: CreateAssetDamage for asset5');
+			await contract.submitTransaction('CreateAssetDamage', 'asset5', 'Probusena desna prednja guma', '3400.00');
+			console.log('*** Result: committed');
+
+			console.log('\n--> Evaluate Transaction: ReadAsset, function returns "asset5" attributes');
+			result = await contract.evaluateTransaction('ReadAsset', 'asset5');
+			console.log(`*** Result: ${prettyJSONString(result.toString())}`);
+
+			try {
+				// How about we try a transactions where the executing chaincode throws an error
+				// Notice how the submitTransaction will throw an error containing the error thrown by the chaincode
+				console.log('\n--> Submit Transaction: TransferAsset asset6, transfer to new owner of user1. Asset6 has damage and should return an error');
+				await contract.submitTransaction('TransferAsset', 'asset5', 'user2', 'false');
+				console.log('*** Result: committed');
+			} catch (error) {
+				console.log(`*** Successfully caught the error: \n    ${error}`);
+			}
+
+			console.log('\n--> Submit Transaction: RepairDamages for asset5');
+			await contract.submitTransaction('RepairDamages', 'asset5', 'user3');
+			console.log('*** Result: committed');
+
+			console.log('\n--> Evaluate Transaction: ReadAsset, function returns "asset5" attributes');
+			result = await contract.evaluateTransaction('ReadAsset', 'asset5');
+			console.log(`*** Result: ${prettyJSONString(result.toString())}`);
+
+			console.log('\n--> Submit Transaction: TransferAsset asset5, transfer to new owner of user1.');
+			await contract.submitTransaction('TransferAsset', 'asset5', 'user2', 'false');
+			console.log('*** Result: committed');
+
+			console.log('\n--> Evaluate Transaction: FindAssets, function returns assets with color black');
+			result = await contract.evaluateTransaction('FindAssets', 'black', '');
 			console.log(`*** Result: ${prettyJSONString(result.toString())}`);
 
 			try {
@@ -176,7 +226,6 @@ async function main() {
 			} catch (error) {
 				console.log(`*** Successfully caught the error: \n    ${error}`);
 			}
-
 
 		} finally {
 			// Disconnect from the gateway when the application is closing

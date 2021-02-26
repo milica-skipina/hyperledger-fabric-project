@@ -64,7 +64,7 @@ func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) 
 
 		err = ctx.GetStub().PutState(user.ID, userJSON)
 		if err != nil {
-			return fmt.Errorf("failed to put to world state. %v", err)
+			return fmt.Errorf("failed to put user to world state. %v", err)
 		}
 	}
 
@@ -76,7 +76,7 @@ func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) 
 
 		err = ctx.GetStub().PutState(asset.ID, assetJSON)
 		if err != nil {
-			return fmt.Errorf("failed to put to world state. %v", err)
+			return fmt.Errorf("failed to put asset to world state. %v", err)
 		}
 	}
 
@@ -109,6 +109,32 @@ func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface,
 	}
 
 	return ctx.GetStub().PutState(id, assetJSON)
+}
+
+// CreateUser issues a new user to the world state with given details.
+func (s *SmartContract) CreateUser(ctx contractapi.TransactionContextInterface, id string, name string, lastname string, email string, money float64) error {
+	exists, err := s.AssetExists(ctx, id)
+	if err != nil {
+		return err
+	}
+	if exists {
+		return fmt.Errorf("the user %s already exists", id)
+	}
+
+	user := User{
+		ID:       id,
+		Name:     name,
+		Lastname: lastname,
+		Email:    email,
+		Money:    money,
+	}
+
+	userJSON, err := json.Marshal(user)
+	if err != nil {
+		return err
+	}
+
+	return ctx.GetStub().PutState(id, userJSON)
 }
 
 // ReadAsset returns the asset stored in the world state with given id.
@@ -150,29 +176,29 @@ func (s *SmartContract) ReadUser(ctx contractapi.TransactionContextInterface, id
 }
 
 // UpdateAsset updates an existing asset in the world state with provided parameters.
-func (s *SmartContract) UpdateAsset(ctx contractapi.TransactionContextInterface, id string, color string, size int, owner string, appraisedValue float64) error {
-	exists, err := s.AssetExists(ctx, id)
-	if err != nil {
-		return err
-	}
-	if !exists {
-		return fmt.Errorf("the asset %s does not exist", id)
-	}
+// func (s *SmartContract) UpdateAsset(ctx contractapi.TransactionContextInterface, id string, color string, size int, owner string, appraisedValue float64) error {
+// 	exists, err := s.AssetExists(ctx, id)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	if !exists {
+// 		return fmt.Errorf("the asset %s does not exist", id)
+// 	}
 
-	// overwriting original asset with new asset
-	asset := Asset{
-		ID:             id,
-		Color:          color,
-		OwnerID:        owner,
-		AppraisedValue: appraisedValue,
-	}
-	assetJSON, err := json.Marshal(asset)
-	if err != nil {
-		return err
-	}
+// 	// overwriting original asset with new asset
+// 	asset := Asset{
+// 		ID:             id,
+// 		Color:          color,
+// 		OwnerID:        owner,
+// 		AppraisedValue: appraisedValue,
+// 	}
+// 	assetJSON, err := json.Marshal(asset)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	return ctx.GetStub().PutState(id, assetJSON)
-}
+// 	return ctx.GetStub().PutState(id, assetJSON)
+// }
 
 // DeleteAsset deletes an given asset from the world state.
 func (s *SmartContract) DeleteAsset(ctx contractapi.TransactionContextInterface, id string) error {
