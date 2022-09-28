@@ -1,6 +1,6 @@
-# PDASP
+# Parallel and distributed architecture and languages
 
-Parallel and distributed architecture and languages - a course in master academic studies in Computing and Control Engineering, Faculty of Technical Sciences, University of Novi Sad
+Parallel and distributed architecture and languages - a course in master's academic studies in Computing and Control Engineering, Faculty of Technical Sciences, University of Novi Sad
 
 
 To run application open terminal from root folder and run:
