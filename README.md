@@ -1,5 +1,8 @@
 # PDASP
 
+Parallel and distributed architecture and languages - a course in master academic studies in Computing and Control Engineering, Faculty of Technical Sciences, University of Novi Sad
+
+
 To run application open terminal from root folder and run:
 ```
 $ cd fabric-samples/test-network 
